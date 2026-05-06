@@ -25,26 +25,30 @@ public class Client {
     private Integer id;
 
     @Column(unique = true, nullable = false)
-    @NotBlank(message = "Le numéro de pièce est obligatoire")
+    @NotBlank(message = "Le champ numPiece est obligatoire.")
+    @Pattern(regexp = "^\\d{13}$", message = "Le champ numPiece doit contenir exactement 13 chiffres.")
     private String numPiece;
 
     @Column(nullable = false)
-    @NotBlank(message = "Le prénom est obligatoire")
+    @NotBlank(message = "Le champ prenom est obligatoire.")
     private String prenom;
 
     @Column(nullable = false)
-    @NotBlank(message = "Le nom est obligatoire")
+    @NotBlank(message = "Le champ nom est obligatoire.")
     private String nom;
 
     private String adresse;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Past(message = "La date de naissance doit être dans le passé")
+    @Past(message = "Le champ dateNaissance doit être une date passée.")
     private LocalDate dateNaissance;
 
     @Column(unique = true, nullable = false, length = 20)
-    @NotBlank(message = "Le téléphone est obligatoire")
-    @Pattern(regexp = "^[0-9+\\s-]{8,20}$", message = "Numéro de téléphone invalide")
+    @NotBlank(message = "Le champ telephone est obligatoire.")
+    @Pattern(
+            regexp = "^(?:((70|75|76|77|78)\\d{7})|((70|75|76|77|78) \\d{3} \\d{2} \\d{2})|(\\+221 (70|75|76|77|78) \\d{3} \\d{2} \\d{2}))$",
+            message = "Le champ telephone doit être au format sénégalais valide : 7XXXXXXXX, 7X XXX XX XX ou +221 7X XXX XX XX."
+    )
     private String telephone;
 
     @OneToOne(mappedBy = "client", fetch = FetchType.LAZY)

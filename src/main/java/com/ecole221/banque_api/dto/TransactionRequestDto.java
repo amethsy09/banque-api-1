@@ -9,20 +9,20 @@ import lombok.Data;
 public class TransactionRequestDto {
 
     @Schema(description = "Numéro du compte cible", example = "BQ-20250101-A1B2C3D4")
-    @NotBlank(message = "Le numéro de compte est obligatoire")
+    @NotBlank(message = "Le champ compteNumero est obligatoire.")
     @Pattern(
             regexp = "^BQ-\\d{8}-[A-Z0-9]{8}$",
-            message = "Le numéro de compte doit respecter le format BQ-YYYYMMDD-XXXXXXXX"
+            message = "Le champ compteNumero doit respecter le format BQ-YYYYMMDD-XXXXXXXX."
     )
     private String compteNumero;
 
     @Schema(description = "Montant de l'opération", example = "15000")
-    @NotNull(message = "Le montant est obligatoire")
-    @Positive(message = "Le montant doit être positif")
+    @NotNull(message = "Le champ montant est obligatoire.")
+    @Positive(message = "Le champ montant doit être positif.")
     private Long montant;
 
     @Schema(description = "Type d'opération", allowableValues = {"DEPOT", "RETRAIT"}, example = "DEPOT")
-    @NotBlank(message = "Le type de transaction est obligatoire")
-    @Pattern(regexp = "^(DEPOT|RETRAIT)$", message = "Le type doit être DEPOT ou RETRAIT")
+    @NotBlank(message = "Le champ type est obligatoire.")
+    @Pattern(regexp = "^(DEPOT|RETRAIT)$", message = "Le champ type doit être égal à DEPOT ou RETRAIT.")
     private String type;
 }

@@ -23,7 +23,7 @@ public class Transaction {
     private Integer id;
 
     @Column(nullable = false)
-    @Positive(message = "Le montant doit être positif")
+    @Positive(message = "Le champ montant doit être positif.")
     private long montant;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -31,14 +31,14 @@ public class Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "type_id", nullable = false)
-    @NotNull(message = "Le type de transaction est obligatoire")
+    @NotNull(message = "Le champ type est obligatoire.")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Type type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "compte_id", nullable = false)
-    @NotNull(message = "Le compte est obligatoire")
+    @NotNull(message = "Le champ compte est obligatoire.")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Compte compte;

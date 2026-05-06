@@ -25,7 +25,7 @@ public class Compte {
     private Integer id;
 
     @Column(unique = true, nullable = false)
-    @NotBlank(message = "Le numéro de compte est obligatoire")
+    @NotBlank(message = "Le champ numero est obligatoire.")
     private String numero;
 
     @Column(nullable = false)
@@ -36,7 +36,7 @@ public class Compte {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
-    @NotNull(message = "Le client est obligatoire")
+    @NotNull(message = "Le champ client est obligatoire.")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Client client;

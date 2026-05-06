@@ -22,7 +22,7 @@ public class Type {
     private Integer id;
 
     @Column(nullable = false, unique = true)
-    @NotBlank(message = "Le libellé est obligatoire")
+    @NotBlank(message = "Le champ libelle est obligatoire.")
     private String libelle;
 
     @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
