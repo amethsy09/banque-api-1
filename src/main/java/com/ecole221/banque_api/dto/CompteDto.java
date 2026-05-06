@@ -7,13 +7,13 @@ import java.time.LocalDate;
 
 @Data
 public class CompteDto {
-    private Long id;
+    private Integer id;
     private String numero;
     private long solde;
     private LocalDate dateCreation;
 
     @NotNull(message = "L'identifiant du client est obligatoire")
-    private Long clientId;
+    private Integer clientId;
 
     private String clientNomComplet;
 }
