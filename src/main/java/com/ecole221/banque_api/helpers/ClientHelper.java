@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -37,7 +38,11 @@ public class ClientHelper {
     }
 
     public ClientDto trouverParId(Integer id) {
-        return clientMapper.toDto(clientService.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Client introuvable avec l'id: " + id)));
+        Client client = getOrThrow(clientService.findById(id), "Client introuvable avec l'id: " + id);
+        return clientMapper.toDto(client);
+    }
+
+    private <T> T getOrThrow(Optional<T> optional, String message) {
+        return optional.orElseThrow(() -> new ResourceNotFoundException(message));
     }
 }

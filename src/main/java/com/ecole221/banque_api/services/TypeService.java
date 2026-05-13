@@ -1,6 +1,6 @@
 package com.ecole221.banque_api.services;
 
-import com.ecole221.banque_api.models.Type;
+import com.ecole221.banque_api.models.Categorie;
 import com.ecole221.banque_api.repository.TypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,11 @@ public class TypeService {
     private final TypeRepository typeRepository;
 
     @Transactional(readOnly = true)
-    public Optional<Type> findByLibelleIgnoreCase(String libelle) {
+    public Optional<Categorie> findByLibelleIgnoreCase(String libelle) {
         return typeRepository.findByLibelleIgnoreCase(libelle);
+    }
+
+    public Categorie save(Categorie type) {
+        return typeRepository.save(type);
     }
 }

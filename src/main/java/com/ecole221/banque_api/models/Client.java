@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.ecole221.banque_api.services.Reservation;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,13 +61,14 @@ public class Client {
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Collection<Compte> comptes;
+    private Collection<Reservation> reservations;
 
-    public void addCompte(Compte compte) {
-        if (comptes == null) {
-            comptes = new ArrayList<>();
+    public void addReservation(Reservation reservation) {
+        if (reservations == null) {
+            reservations = new ArrayList<>();
         }
-        comptes.add(compte);
-        compte.setClient(this);
+        reservations.add(reservation);
+        reservations.setClient(this);
+
     }
 }

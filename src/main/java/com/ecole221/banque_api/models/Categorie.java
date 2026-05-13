@@ -14,8 +14,8 @@ import java.util.Collection;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "types")
-public class Type {
+@Table(name = "categorie")
+public class Categorie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +25,8 @@ public class Type {
     @NotBlank(message = "Le champ libelle est obligatoire.")
     private String libelle;
 
-    @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "categorie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Collection<Transaction> transactions;
+    private Collection<Chambre> chambres;
 }

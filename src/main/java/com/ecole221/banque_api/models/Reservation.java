@@ -17,8 +17,8 @@ import java.util.Collection;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "comptes")
-public class Compte {
+@Table(name = "reservation")
+public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +27,6 @@ public class Compte {
     @Column(unique = true, nullable = false)
     @NotBlank(message = "Le champ numero est obligatoire.")
     private String numero;
-
-    @Column(nullable = false)
-    private long solde = 0;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateCreation;
@@ -41,17 +38,17 @@ public class Compte {
     @EqualsAndHashCode.Exclude
     private Client client;
 
-    @OneToMany(mappedBy = "compte", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Collection<Transaction> transactions;
+    private Collection<Chambre> chambres;
 
-    public void addTransaction(Transaction transaction) {
-        if (transactions == null) {
-            transactions = new ArrayList<>();
+    public void addChambre(Chambre chambre) {
+        if (chambres == null) {
+            chambres = new ArrayList<>();
         }
-        transactions.add(transaction);
-        transaction.setCompte(this);
+        chambres.add(chambre);
+        chambre.setReservation(this);
     }
 
     @PrePersist

@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class TransactionDto {
+public class ChambreDto {
     private Integer id;
     private long montant;
     private LocalDate date;

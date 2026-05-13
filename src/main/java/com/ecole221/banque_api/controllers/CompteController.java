@@ -1,8 +1,8 @@
 package com.ecole221.banque_api.controllers;
 
-import com.ecole221.banque_api.dto.CompteCreateDto;
-import com.ecole221.banque_api.dto.CompteDto;
-import com.ecole221.banque_api.dto.TransactionDto;
+import com.ecole221.banque_api.dto.ReservationCreateDto;
+import com.ecole221.banque_api.dto.ReservationDto;
+import com.ecole221.banque_api.dto.ChambreDto;
 import com.ecole221.banque_api.dto.TransactionRequestDto;
 import com.ecole221.banque_api.helpers.CompteHelper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,13 +49,13 @@ public class CompteController {
             @ApiResponse(responseCode = "404", description = "Client introuvable"),
             @ApiResponse(responseCode = "400", description = "Données invalides")
     })
-    public ResponseEntity<CompteDto> creerCompte(
+    public ResponseEntity<ReservationDto> creerCompte(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Informations nécessaires à la création d'un compte",
                     required = true,
                     content = @Content(
-                            schema = @Schema(implementation = CompteCreateDto.class),
+                            schema = @Schema(implementation = ReservationCreateDto.class),
                             examples = @ExampleObject(
                                     name = "Nouveau compte",
                                     value = """
@@ -67,7 +67,7 @@ public class CompteController {
                             )
                     )
             )
-            @RequestBody CompteCreateDto dto) {
+            @RequestBody ReservationCreateDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(compteHelper.creerCompte(dto));
     }
 
@@ -87,7 +87,7 @@ public class CompteController {
             @ApiResponse(responseCode = "200", description = "Liste des comptes"),
             @ApiResponse(responseCode = "404", description = "Client introuvable")
     })
-    public ResponseEntity<List<CompteDto>> listerComptesDuClient(
+    public ResponseEntity<List<ReservationDto>> listerComptesDuClient(
             @Parameter(description = "ID numérique du client", example = "1")
             @Positive(message = "L'id du client doit être positif")
             @PathVariable Integer clientId) {
@@ -110,7 +110,7 @@ public class CompteController {
             @ApiResponse(responseCode = "200", description = "Compte trouvé"),
             @ApiResponse(responseCode = "404", description = "Compte introuvable")
     })
-    public ResponseEntity<CompteDto> rechercherParNumero(
+    public ResponseEntity<ReservationDto> rechercherParNumero(
             @Parameter(description = "Numéro du compte", example = "BQ-20250101-A1B2C3D4") @PathVariable String numero) {
         return ResponseEntity.ok(compteHelper.rechercherParNumero(numero));
     }
@@ -131,7 +131,7 @@ public class CompteController {
             @ApiResponse(responseCode = "200", description = "Infos du compte"),
             @ApiResponse(responseCode = "404", description = "Compte introuvable")
     })
-    public ResponseEntity<CompteDto> afficherInfos(
+    public ResponseEntity<ReservationDto> afficherInfos(
             @Parameter(description = "ID numérique du compte", example = "1")
             @Positive(message = "L'id du compte doit être positif")
             @PathVariable Integer id) {
@@ -159,7 +159,7 @@ public class CompteController {
             @ApiResponse(responseCode = "400", description = "Transaction refusée (contrainte métier ou données invalides)"),
             @ApiResponse(responseCode = "404", description = "Compte introuvable")
     })
-    public ResponseEntity<TransactionDto> effectuerTransaction(
+    public ResponseEntity<ChambreDto> effectuerTransaction(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Demande de dépôt ou de retrait",

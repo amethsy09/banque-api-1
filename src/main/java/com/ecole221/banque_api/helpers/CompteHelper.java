@@ -1,24 +1,25 @@
 package com.ecole221.banque_api.helpers;
 
-import com.ecole221.banque_api.dto.CompteCreateDto;
-import com.ecole221.banque_api.dto.CompteDto;
-import com.ecole221.banque_api.dto.TransactionDto;
+import com.ecole221.banque_api.dto.ReservationCreateDto;
+import com.ecole221.banque_api.dto.ReservationDto;
+import com.ecole221.banque_api.dto.ChambreDto;
 import com.ecole221.banque_api.dto.TransactionRequestDto;
 import com.ecole221.banque_api.exceptions.ResourceNotFoundException;
 import com.ecole221.banque_api.exceptions.TransactionException;
-import com.ecole221.banque_api.mappers.CompteMapper;
-import com.ecole221.banque_api.mappers.TransactionMapper;
+import com.ecole221.banque_api.mappers.ReservationMapper;
+import com.ecole221.banque_api.mappers.ChambreMapper;
 import com.ecole221.banque_api.models.Client;
-import com.ecole221.banque_api.models.Compte;
-import com.ecole221.banque_api.models.Transaction;
-import com.ecole221.banque_api.models.Type;
+import com.ecole221.banque_api.models.Reservation;
+import com.ecole221.banque_api.models.Chambre;
+import com.ecole221.banque_api.models.Categorie;
 import com.ecole221.banque_api.services.ClientService;
-import com.ecole221.banque_api.services.CompteService;
+import com.ecole221.banque_api.services.Reservation;
 import com.ecole221.banque_api.services.TypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -28,18 +29,17 @@ public class CompteHelper {
     private static final long SOLDE_MINIMUM = -50_000L;
     private static final long SOLDE_MAXIMUM = 50_000L;
 
-    private final CompteService compteService;
+    private final Reservation compteService;
     private final ClientService clientService;
     private final TypeService typeService;
-    private final CompteMapper compteMapper;
-    private final TransactionMapper transactionMapper;
+    private final ReservationMapper compteMapper;
+    private final ChambreMapper transactionMapper;
     private final NumeroCompteHelper numeroCompteHelper;
 
-    public CompteDto creerCompte(CompteCreateDto dto) {
-        Client client = clientService.findById(dto.getClientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Client introuvable avec l'id: " + dto.getClientId()));
+    public ReservationDto creerCompte(ReservationCreateDto dto) {
+        Client client = getOrThrow(clientService.findById(dto.getClientId()), "Client introuvable avec l'id: " + dto.getClientId());
 
-        Compte compte = new Compte();
+        Reservation compte = new Reservation();
         compte.setSolde(dto.getSoldeInitial());
         compte.setNumero(genererNumeroUnique());
         client.addCompte(compte);
@@ -47,29 +47,26 @@ public class CompteHelper {
         return compteMapper.toDto(compteService.save(compte));
     }
 
-    public List<CompteDto> listerComptesDuClient(Integer clientId) {
-        if (!clientService.existsById(clientId)) {
-            throw new ResourceNotFoundException("Client introuvable avec l'id: " + clientId);
-        }
+    public List<ReservationDto> listerComptesDuClient(Integer clientId) {
+        Client client = getOrThrow(clientService.findByIdWithComptes(clientId), "Client introuvable avec l'id: " + clientId);
 
-        return compteService.findByClientId(clientId).stream()
+        return client.getComptes().stream()
                 .map(compteMapper::toDto)
                 .toList();
     }
 
-    public CompteDto rechercherParNumero(String numero) {
-        return compteMapper.toDto(compteService.findByNumero(numero)
-                .orElseThrow(() -> new ResourceNotFoundException("Compte introuvable avec le numero: " + numero)));
+    public ReservationDto rechercherParNumero(String numero) {
+        Reservation compte = getOrThrow(compteService.findByNumero(numero), "Compte introuvable avec le numero: " + numero);
+        return compteMapper.toDto(compte);
     }
 
-    public CompteDto afficherInfos(Integer id) {
-        return compteMapper.toDto(compteService.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Compte introuvable avec l'id: " + id)));
+    public ReservationDto afficherInfos(Integer id) {
+        Reservation compte = getOrThrow(compteService.findById(id), "Compte introuvable avec l'id: " + id);
+        return compteMapper.toDto(compte);
     }
 
-    public TransactionDto effectuerTransaction(TransactionRequestDto request) {
-        Compte compte = compteService.findByNumero(request.getCompteNumero())
-                .orElseThrow(() -> new ResourceNotFoundException("Compte introuvable: " + request.getCompteNumero()));
+    public ChambreDto effectuerTransaction(TransactionRequestDto request) {
+        Reservation compte = getOrThrow(compteService.findByNumero(request.getCompteNumero()), "Compte introuvable: " + request.getCompteNumero());
 
         String typeLibelle = request.getType().toUpperCase().trim();
         long montant = request.getMontant();
@@ -80,14 +77,14 @@ public class CompteHelper {
             default -> throw new TransactionException("Type de transaction invalide. Utiliser DEPOT ou RETRAIT.");
         }
 
-        Type type = typeService.findByLibelleIgnoreCase(typeLibelle)
+        Categorie type = typeService.findByLibelleIgnoreCase(typeLibelle)
                 .orElseGet(() -> {
-                    Type nouveauType = new Type();
+                    Categorie nouveauType = new Categorie();
                     nouveauType.setLibelle(typeLibelle);
-                    return nouveauType;
+                    return typeService.save(nouveauType);
                 });
 
-        Transaction transaction = new Transaction();
+        Chambre transaction = new Chambre();
         transaction.setMontant(montant);
         transaction.setType(type);
         compte.addTransaction(transaction);
@@ -96,7 +93,7 @@ public class CompteHelper {
         return transactionMapper.toDto(transaction);
     }
 
-    private void effectuerDepot(Compte compte, long montant) {
+    private void effectuerDepot(Reservation compte, long montant) {
         if (montant < DEPOT_MINIMUM) {
             throw new TransactionException(
                     "Le depot minimum est de " + DEPOT_MINIMUM + " FCFA. Montant fourni: " + montant);
@@ -105,7 +102,7 @@ public class CompteHelper {
         compte.setSolde(compte.getSolde() + montant);
     }
 
-    private void effectuerRetrait(Compte compte, long montant) {
+    private void effectuerRetrait(Reservation compte, long montant) {
         long soldeActuel = compte.getSolde();
         long soldeApresRetrait = soldeActuel - montant;
 
@@ -131,5 +128,9 @@ public class CompteHelper {
             numero = numeroCompteHelper.generer();
         } while (compteService.existsByNumero(numero));
         return numero;
+    }
+
+    private <T> T getOrThrow(Optional<T> optional, String message) {
+        return optional.orElseThrow(() -> new ResourceNotFoundException(message));
     }
 }

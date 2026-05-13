@@ -97,11 +97,13 @@ public class AuthHelper {
             throw new TransactionException("Le clientId est obligatoire pour un utilisateur USER.");
         }
 
-        if (appUserService.existsByClientId(clientId)) {
+        Client client = clientService.findByIdWithAppUser(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Client introuvable avec l'id: " + clientId));
+
+        if (client.getAppUser() != null) {
             throw new TransactionException("Ce client possede deja un utilisateur.");
         }
 
-        return clientService.findById(clientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Client introuvable avec l'id: " + clientId));
+        return client;
     }
 }

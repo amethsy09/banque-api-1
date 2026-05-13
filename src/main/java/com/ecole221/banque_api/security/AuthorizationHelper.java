@@ -1,21 +1,20 @@
 package com.ecole221.banque_api.security;
 
 import com.ecole221.banque_api.models.AppUser;
-import com.ecole221.banque_api.models.Compte;
-import com.ecole221.banque_api.services.AppUserService;
-import com.ecole221.banque_api.services.CompteService;
+import com.ecole221.banque_api.models.Reservation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component("authorizationHelper")
 @RequiredArgsConstructor
 public class AuthorizationHelper {
 
-    private final AppUserService appUserService;
-    private final CompteService compteService;
+    private final Reservation reservationService;
 
     public boolean canAccessClient(Integer clientId) {
         if (isAdmin()) {
@@ -27,12 +26,12 @@ public class AuthorizationHelper {
                 .orElse(false);
     }
 
-    public boolean canAccessCompteById(Integer compteId) {
+    public boolean canAccessCompteById(Integer reservationId) {
         if (isAdmin()) {
             return true;
         }
 
-        return compteService.findById(compteId)
+        return reservationService.findById(reservationId)
                 .map(this::isOwner)
                 .orElse(false);
     }
@@ -42,16 +41,16 @@ public class AuthorizationHelper {
             return true;
         }
 
-        return compteService.findByNumero(numero)
+        return reservationService.findByNumero(numero)
                 .map(this::isOwner)
                 .orElse(false);
     }
 
-    private boolean isOwner(Compte compte) {
+    private boolean isOwner(Reservation reservation) {
         return getCurrentUser()
                 .map(user -> user.getClient() != null
-                        && compte.getClient() != null
-                        && user.getClient().getId().equals(compte.getClient().getId()))
+                        && reservation.getClient() != null
+                        && user.getClient().getId().equals(reservation.getClient().getId()))
                 .orElse(false);
     }
 
@@ -66,13 +65,18 @@ public class AuthorizationHelper {
                 .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
     }
 
-    private java.util.Optional<AppUser> getCurrentUser() {
+    private Optional<AppUser> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()
                 || authentication instanceof AnonymousAuthenticationToken) {
-            return java.util.Optional.empty();
+            return Optional.empty();
         }
 
-        return appUserService.findByUsername(authentication.getName());
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof AppUser appUser) {
+            return Optional.of(appUser);
+        }
+
+        return Optional.empty();
     }
 }

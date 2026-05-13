@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class CompteDto {
+public class ReservationDto {
     private Integer id;
     private String numero;
     private long solde;

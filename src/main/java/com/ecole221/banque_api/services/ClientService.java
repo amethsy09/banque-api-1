@@ -41,4 +41,14 @@ public class ClientService {
     public Optional<Client> findById(Integer id) {
         return clientRepository.findById(id);
     }
+
+    @Transactional(readOnly = true)
+    public Optional<Client> findByIdWithAppUser(Integer id) {
+        return clientRepository.findByIdWithAppUser(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Client> findByIdWithComptes(Integer id) {
+        return clientRepository.findByIdWithComptes(id);
+    }
 }
